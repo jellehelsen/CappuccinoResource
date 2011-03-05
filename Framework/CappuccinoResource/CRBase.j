@@ -33,6 +33,11 @@ var defaultIdentifierKey = @"id",
     return {};
 }
 
+- (JSObject)relations
+{
+    CPLog.warn('This method must be declared in your class for nested attributes to work properly.');
+    return {};
+}
 // switch to this if we can get attribute types
 // + (CPDictionary)attributes
 // {
@@ -98,6 +103,40 @@ var defaultIdentifierKey = @"id",
                             [self setValue:value forKey:attributeName];
                         }
                         break;
+                    case "object":
+                            //debugger;
+                           if (value != null && value.length != null) {
+                                var includedClass = objj_getClass([attribute classifiedString]);
+ 
+                                if (includedClass != null) {
+                                    // CPLog.warn("Attribute " + attribute + " is an array of " + includedClass + " of length " + value.length)
+                                    var included = [];
+                                    for (var i = 0; i < value.length; i++) {
+                                        var newObject;
+                                        var nestedValue = [value objectAtIndex:i];
+                                        // In Test the nested attribute hashes can be strings
+                                        if (typeof nestedValue == "string") {
+                                            newObject = [includedClass new:JSON.parse(nestedValue)]
+                                        } else {
+                                            newObject = [includedClass new:nestedValue]
+                                        }
+                                        [included addObject:newObject]
+                                    }
+                                    [self setValue:included forKey:attributeName];
+                                } else {
+                                    // CPLog.warn("Attribute " + attribute + " is an array of value " + value + " of length " + value.length)
+                                    [self setValue:value forKey:attributeName];
+                                }
+                           } else {
+                                var includedClass = objj_getClass([attribute classifiedString]);
+                                // CPLog.warn("Attribute " + attribute + " is an object, its classified string is " + includedClass)
+                                [self setValue:[objj_getClass([attribute classifiedString]) new:value] forKey:attributeName];
+                           }
+
+                        break;
+                        //var klass = [self relations][attributeName] 
+                        //var object = [klass new:value];
+                        //[self setValue:object forKey:attributeName];
                 }
             }
         }

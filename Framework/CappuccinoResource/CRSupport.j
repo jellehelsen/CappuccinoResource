@@ -114,6 +114,25 @@
         return obj;
     }
 }
+- (CPString)camelcaseUnderscores
+{
+    var array  = self.split('_');
+    for (var x = 1; x < array.length; x++) // skip first word
+        array[x] = array[x].charAt(0).toUpperCase() +array[x].substring(1);
+    var string = array.join('');
+ 
+    return string;
+}
+ 
+- (CPString)classifiedString
+{
+    var string = [self camelcaseUnderscores]
+    var stripS  = new RegExp('s$');
+ 
+    var newStr = string.replace(stripS,'');
+    return newStr.charAt(0).toUpperCase() + newStr.substring(1);
+}
+ 
 
 @end
 
